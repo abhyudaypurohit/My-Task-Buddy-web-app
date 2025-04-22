@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Task Buddy Web App</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+
+    <h1 class="text-center">📋 My Task Buddy</h1>
+
+    <!-- Add Task Button -->
+    <div class="text-center my-3">
+        <a href="{% url 'add_task' %}" class="btn btn-primary">➕ Add New Task</a>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="text-center my-3">
+        <a href="{% url 'task_list' %}" class="btn {% if not filter_type %}btn-primary{% else %}btn-outline-primary{% endif %}">📌 All Tasks</a>
+        <a href="{% url 'task_list' %}?filter=pending" class="btn {% if filter_type == 'pending' %}btn-primary{% else %}btn-outline-primary{% endif %}">🕒 Pending</a>
+        <a href="{% url 'task_list' %}?filter=completed" class="btn {% if filter_type == 'completed' %}btn-primary{% else %}btn-outline-primary{% endif %}">✅ Completed</a>
+    </div>
+
+    <!-- Task List -->
+    <ul class="list-group">
+        {% for task in tasks %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                
+                <!-- Task Title & Due Date -->
+                <div>
+                    <span class="{% if task.completed %}text-muted text-decoration-line-through{% endif %}">
+                        {{ task.title }}
+                    </span>
+                    <br>
+                    <small class="text-muted">📅 Due: {{ task.due_date|default:"No due date" }}</small>
+                </div>
+
+                <!-- Action Buttons -->
+                <div>
+                    <form action="{% url 'toggle_task_status' task.id %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn {% if task.completed %}btn-warning{% else %}btn-success{% endif %} btn-sm">
+                            {% if task.completed %} ❌ Unmark as Done {% else %} ✔ Mark as Done {% endif %}
+                        </button>
+                    </form>
+                    <a href="{% url 'delete_task' task.id %}" class="btn btn-danger btn-sm">🗑 Delete</a>
+                </div>
+            </li>
+        {% empty %}
+            <li class="list-group-item text-center">No tasks available.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Bootstrap JS (Optional, for interactivity) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
